@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encryption and Decryption Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #0d0d0d;
+            color: #00ffcc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Header style */
+        .header-box {
+            background-color: #1c1c1e;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+            border: 2px solid #00ffcc;
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        .header-box h1 {
+            font-size: 32px;
+            color: #00ffcc;
+            text-shadow: 0 0 5px #00ffcc;
+            letter-spacing: 1.5px;
+        }
+
+        /* Main container style */
+        .container {
+            width: 95%;
+            max-width: 1400px;
+            background-color: #1c1c1e;
+            padding: 50px;
+            margin-bottom: 40px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.3), 0 0 40px rgba(0, 255, 204, 0.5);
+            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        h2 {
+            font-size: 22px;
+            color: #a1a1a1;
+            margin-bottom: 15px;
+            text-shadow: 0 0 3px #00ffcc;
+        }
+
+        /* Section style */
+        .section {
+            flex: 1;
+            background-color: #2d2d30;
+            padding: 35px;
+            border-radius: 10px;
+            box-shadow: inset 0 0 8px rgba(0, 255, 204, 0.3);
+        }
+
+        /* Input and button style*/
+        textarea,
+        input,
+        select {
+            width: 100%;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 8px;
+            border: 1px solid #00ffcc;
+            background-color: #333;
+            color: #00ffcc;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 8px;
+            background-color: #00ffcc;
+            color: #0d0d0d;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 0 8px rgba(0, 255, 204, 0.4);
+        }
+
+        button:hover {
+            background-color: #00e6b8;
+            transform: scale(1.05);
+        }
+
+        /* Footer styling */
+        footer {
+            width: 100%;
+            background-color: #1c1c1e;
+            color: #00ffcc;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: auto;
+            border-top: 1px solid #00ffcc;
+        }
+
+        footer p {
+            margin: 5px 0;
+            color: #00e6b8;
+            font-size: 14px;
+        }
+    </style>
+    <!-- JS crypto laibarry-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+
+<body>
+    <!-- Main Heading  -->
+    <div class="header-box">
+        <h1>Encryption and Decryption Tool</h1>
+    </div>
+
+    <div class="container">
+        <!-- Encryption Section -->
+        <div class="section">
+            <h2>Encryption</h2>
+            <select id="encryptionType">
+                <option value="aes">AES</option>
+                <option value="des">DES</option>
+            </select>
+            <input type="text" id="encryptionKey" placeholder="Enter encryption key">
+            <textarea id="plainText" placeholder="Enter text to encrypt"></textarea>
+            <button onclick="encryptText()">Encrypt</button>
+            <textarea id="encryptedText" readonly placeholder="Encrypted text will appear here"></textarea>
+            <button onclick="copyText('encryptedText')">Copy</button>
+        </div>
+
+        <!-- Decryption Section -->
+        <div class="section">
+            <h2>Decryption</h2>
+            <select id="decryptionType">
+                <option value="aes">AES</option>
+                <option value="des">DES</option>
+            </select>
+            <input type="text" id="decryptionKey" placeholder="Enter decryption key">
+            <textarea id="encryptedInput" placeholder="Enter text to decrypt"></textarea>
+            <button onclick="decryptText()">Decrypt</button>
+            <textarea id="decryptedText" readonly placeholder="Decrypted text will appear here"></textarea>
+            <button onclick="resetPage()">Reset</button>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>Developed by Fokhrul Islam Plabon, Eyasin Hossain Shawon, MD Maheraj Hossain</p>
+        <p id="date"></p>
+    </footer>
+
+    <script>
+        function encryptText() {
+            const encryptionType = document.getElementById('encryptionType').value;
+            const key = document.getElementById('encryptionKey').value;
+            const plainText = document.getElementById('plainText').value;
+
+            if (!key || !plainText) {
+                alert("Please enter both text and key for encryption.");
+                return;
+            }
+
+            let encryptedText = "";
+
+            if (encryptionType === "aes") {
+                encryptedText = CryptoJS.AES.encrypt(plainText, key).toString();
+            } else if (encryptionType === "des") {
+                encryptedText = CryptoJS.DES.encrypt(plainText, key).toString();
+            }
+
+            document.getElementById('plainText').value = "";
+            document.getElementById('encryptedText').value = encryptedText;
+        }
+
+        function decryptText() {
+            const decryptionType = document.getElementById('decryptionType').value;
+            const key = document.getElementById('decryptionKey').value;
+            const encryptedInput = document.getElementById('encryptedInput').value;
+
+            if (!key || !encryptedInput) {
+                alert("Please enter both encrypted text and key for decryption.");
+                return;
+            }
+
+            let decryptedText = "";
+
+            try {
+                if (decryptionType === "aes") {
+                    decryptedText = CryptoJS.AES.decrypt(encryptedInput, key).toString(CryptoJS.enc.Utf8);
+                } else if (decryptionType === "des") {
+                    decryptedText = CryptoJS.DES.decrypt(encryptedInput, key).toString(CryptoJS.enc.Utf8);
+                }
+
+                if (!decryptedText) throw new Error("Invalid key");
+                document.getElementById('decryptedText').value = decryptedText;
+                document.getElementById('encryptedInput').value = "";
+            } catch (error) {
+                alert("Incorrect key or encryption type.");
+            }
+        }
+
+        function copyText(elementId) {
+            const text = document.getElementById(elementId);
+            text.select();
+            document.execCommand("copy");
+            alert("Text copied to clipboard");
+        }
+
+        function resetPage() {
+            location.reload();
+        }
+
+        // Display real-time date 
+        function displayDate() {
+            const dateElement = document.getElementById("date");
+            const currentDate = new Date();
+            dateElement.innerText = "Date: " + currentDate.toLocaleString();
+        }
+
+        // Call the displayDate function to show the date
+        displayDate();
+    </script>
+</body>
+
+</html>
